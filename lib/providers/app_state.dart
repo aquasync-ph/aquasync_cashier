@@ -33,7 +33,13 @@ class AppState extends ChangeNotifier {
   StreamSubscription<List<Map<String, dynamic>>>? _ordersStreamSubscription;
   StreamSubscription<List<Map<String, dynamic>>>? _profileStreamSubscription;
 
-  SupabaseClient get _supabase => Supabase.instance.client;
+  SupabaseClient get _supabase {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      throw Exception('Supabase connection is not initialized. Please refresh the page or check network settings.');
+    }
+  }
 
   String _normalizePaymentMethod(String? raw) {
     if (raw == null) return 'Cash';
