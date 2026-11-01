@@ -21,7 +21,11 @@ jobs:
           echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
           echo "BREVO_API_KEY=${{ secrets.BREVO_API_KEY }}" >> .env
       - run: flutter pub get
-      - run: flutter build web --release --base-href="/aquasync_cashier/"
+      - run: |
+          flutter build web --release --base-href="/aquasync_cashier/" \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" \
+            --dart-define=BREVO_API_KEY="${{ secrets.BREVO_API_KEY }}"
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
