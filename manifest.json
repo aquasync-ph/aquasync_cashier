@@ -1,6 +1,6 @@
 {
-    "name": "aquasync_cashier_app",
-    "short_name": "aquasync_cashier_app",
+    "name": "aquasync_driver_app",
+    "short_name": "aquasync_driver_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
