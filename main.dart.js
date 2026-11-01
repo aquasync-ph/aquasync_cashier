@@ -8392,7 +8392,7 @@ break
 case 5:q=8
 l=A.aVx()
 s=11
-return A.k(A.Vy(A.aVw(),l),$async$a5P)
+return A.k(A.Vy(A.aVw(),null,l),$async$a5P)
 case 11:q=1
 s=10
 break
@@ -31220,123 +31220,125 @@ agU:function agU(){},
 asm:function asm(a){this.b=a},
 asl:function asl(a){this.a=a
 this.b=$},
-Vy(a6,a7){var s=0,r=A.u(t._k),q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5
-var $async$Vy=A.v(function(a8,a9){if(a8===1)return A.q(a9,r)
-for(;;)switch(s){case 0:a5=$.j0()
-if(a5.a){$.aR8().b_(B.eT,"Supabase is already initialized. Skipping reinitialization.",null,null)
-q=a5
+Vy(a7,a8,a9){var s=0,r=A.u(t._k),q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6
+var $async$Vy=A.v(function(b0,b1){if(b0===1)return A.q(b1,r)
+for(;;)switch(s){case 0:if(a8==null){a7.toString
+p=a7}else p=a8
+o=$.j0()
+if(o.a){$.aR8().b_(B.eT,"Supabase is already initialized. Skipping reinitialization.",null,null)
+q=o
 s=1
-break}a5.d=!1
-p=$.aR8()
-p.b_(B.dR,"Initialize Supabase v2.17.2",null,null)
-o=new A.asl(new A.aN(new A.a7($.ag,t.U),t.h))
-o.Bw()
-n=B.Mk.aye(o)
-if(n.d==null){o=B.b.gZ(A.di(a7,0,null).gm1().split("."))
-n=n.ayb(new A.asm("sb-"+o+"-auth-token"))}o=t.N
-m=A.cp($.aZi(),o,o)
-l=A.cN("supabase.supabase")
-k=a7+"/rest/v1"
-j=A.c2(a7+"/realtime/v1","http","ws")
-i=a7+"/auth/v1"
-h=a7+"/storage/v1"
-g=a7+"/functions/v1"
-f=A.cp($.aZj(),o,o)
-f.I(0,m)
-m=new A.awM()
-m.ev()
-e=new A.H3(a6,B.HJ,k,j,i,h,g,f,null,m,!1,null,new A.a98(),l)
+break}o.d=!1
+n=$.aR8()
+n.b_(B.dR,"Initialize Supabase v2.17.2",null,null)
+m=new A.asl(new A.aN(new A.a7($.ag,t.U),t.h))
+m.Bw()
+l=B.Mk.aye(m)
+if(l.d==null){m=B.b.gZ(A.di(a9,0,null).gm1().split("."))
+l=l.ayb(new A.asm("sb-"+m+"-auth-token"))}m=t.N
+k=A.cp($.aZi(),m,m)
+j=A.cN("supabase.supabase")
+i=a9+"/rest/v1"
+h=A.c2(a9+"/realtime/v1","http","ws")
+g=a9+"/auth/v1"
+f=a9+"/storage/v1"
+e=a9+"/functions/v1"
+d=A.cp($.aZj(),m,m)
+d.I(0,k)
+k=new A.awM()
+k.ev()
+c=new A.H3(p,B.HJ,i,h,g,f,e,d,null,k,!1,null,new A.a98(),j)
 A.aQu()
-d=new A.vY(A.b([],t.O))
-e.as=d
-c=n.c
-b=A.cp(A.k0(f,o,o),o,o)
-b.m(0,"apikey",a6)
-b.m(0,"Authorization","Bearer "+a6)
-a=t.FB
-a0=A.aOF(null,null,!1,a)
-a=A.aOF(null,null,!0,a)
-a1=A.cN("supabase.auth")
-a2=A.cp($.aZk(),o,o)
-a2.I(0,b)
-b=new A.ae7(new A.aHP(),i,a2,d,A.p(o,t.QK),a0,a,n.b,c,a1)
-b.y=!0
-a1.b_(B.dR,"Initialize GoTrueClient v2.27.2 with url: "+i+", autoRefreshToken: true, flowType: "+c.b+", tickDuration: "+B.lX.k(0)+", tickThreshold: 3",null,null)
-a1.b_(B.bk,"Initialize with headers: "+a2.k(0),null,null)
-c=new A.ae2(i,a2,d)
-c.gVE()
-c.e!==$&&A.aF()
-c.e=new A.ae4()
-c.f!==$&&A.aF()
-c.f=new A.ae5()
-c.r!==$&&A.aF()
-c.r=new A.ae3()
-c.w!==$&&A.aF()
-c.w=new A.ae6()
-b.a=c
-c=b.gt1()
-b.c!==$&&A.aF()
-b.c=new A.aeh()
-b.b!==$&&A.aF()
-b.b=new A.aeg()
-b.d!==$&&A.aF()
-b.d=new A.aei(b,c)
-b.rF()
-b.aoh()
-e.at=b
-c=e.gaiq()
-b=e.z=new A.Bm(d,a6,c,!1)
-e.Q=new A.Bm(d,a6,c,!0)
-A.bfl(a6,l)
-c=A.cp(A.k0(f,o,o),o,o)
-a=A.cN("supabase.postgrest")
-a0=A.aVd(B.Dq,t.S)
-a1=A.cp($.b1j(),o,o)
-a1.I(0,c)
-a.b_(B.dR,"Initialize PostgrestClient with url: "+k+", schema: public",null,null)
-a.b_(B.bk,"Initialize with headers: "+c.k(0),null,null)
-e.CW!==$&&A.aF()
-e.CW=new A.amB(k,a1,"public",b,m,!0,!0,3,a0,null,a)
-k=A.cp(A.k0(f,o,o),o,o)
-c=A.cN("supabase.functions")
-A.cp($.aZl(),o,o).I(0,k)
-c.b_(B.dR,"Initialize FunctionsClient v2.7.1 with url '"+g+"' and region 'null'",null,null)
-c.b_(B.bk,"Initialize with headers: "+k.k(0),null,null)
-e.ax!==$&&A.aF()
-e.ax=new A.adt(m,!0,c)
-m=A.cp(A.k0(f,o,o),o,o)
-k=A.cN("supabase.storage")
-g=A.cp($.aZm(),o,o)
-g.I(0,m)
-g=new A.atK(0,k,h,g)
-g.c=new A.acx(b,A.cN("supabase.storage"))
-k.b_(B.dR,"Initialize SupabaseStorageClient v2.8.0 with url: "+h+", retryAttempts: 0",null,null)
-k.b_(B.bk,"Initialize with headers: "+m.k(0),null,null)
-e.ay!==$&&A.aF()
-e.ay=g
-g=A.U(["apikey",a6],o,t.z)
-m=A.p(o,o)
-m.m(0,"apikey",a6)
-m.I(0,A.k0(f,o,o))
-o=A.b6W(j,B.qP,null,null,m,b,null,g,B.lX,null)
-e.ch!==$&&A.aF()
-e.ch=o
-l.b_(B.dR,"Initialize SupabaseClient v2.16.1 with no custom access token",null,null)
-e.anR()
-a5.b=e
-a5.at4()
-a5.a=!0
-a3=a5.c=new A.Vu($.aZg(),A.cN("supabase.supabase_flutter"))
+b=new A.vY(A.b([],t.O))
+c.as=b
+a=l.c
+a0=A.cp(A.k0(d,m,m),m,m)
+a0.m(0,"apikey",p)
+a0.m(0,"Authorization","Bearer "+p)
+a1=t.FB
+a2=A.aOF(null,null,!1,a1)
+a1=A.aOF(null,null,!0,a1)
+a3=A.cN("supabase.auth")
+a4=A.cp($.aZk(),m,m)
+a4.I(0,a0)
+a0=new A.ae7(new A.aHP(),g,a4,b,A.p(m,t.QK),a2,a1,l.b,a,a3)
+a0.y=!0
+a3.b_(B.dR,"Initialize GoTrueClient v2.27.2 with url: "+g+", autoRefreshToken: true, flowType: "+a.b+", tickDuration: "+B.lX.k(0)+", tickThreshold: 3",null,null)
+a3.b_(B.bk,"Initialize with headers: "+a4.k(0),null,null)
+a=new A.ae2(g,a4,b)
+a.gVE()
+a.e!==$&&A.aF()
+a.e=new A.ae4()
+a.f!==$&&A.aF()
+a.f=new A.ae5()
+a.r!==$&&A.aF()
+a.r=new A.ae3()
+a.w!==$&&A.aF()
+a.w=new A.ae6()
+a0.a=a
+a=a0.gt1()
+a0.c!==$&&A.aF()
+a0.c=new A.aeh()
+a0.b!==$&&A.aF()
+a0.b=new A.aeg()
+a0.d!==$&&A.aF()
+a0.d=new A.aei(a0,a)
+a0.rF()
+a0.aoh()
+c.at=a0
+a=c.gaiq()
+a0=c.z=new A.Bm(b,p,a,!1)
+c.Q=new A.Bm(b,p,a,!0)
+A.bfl(p,j)
+a=A.cp(A.k0(d,m,m),m,m)
+a1=A.cN("supabase.postgrest")
+a2=A.aVd(B.Dq,t.S)
+a3=A.cp($.b1j(),m,m)
+a3.I(0,a)
+a1.b_(B.dR,"Initialize PostgrestClient with url: "+i+", schema: public",null,null)
+a1.b_(B.bk,"Initialize with headers: "+a.k(0),null,null)
+c.CW!==$&&A.aF()
+c.CW=new A.amB(i,a3,"public",a0,k,!0,!0,3,a2,null,a1)
+i=A.cp(A.k0(d,m,m),m,m)
+a=A.cN("supabase.functions")
+A.cp($.aZl(),m,m).I(0,i)
+a.b_(B.dR,"Initialize FunctionsClient v2.7.1 with url '"+e+"' and region 'null'",null,null)
+a.b_(B.bk,"Initialize with headers: "+i.k(0),null,null)
+c.ax!==$&&A.aF()
+c.ax=new A.adt(k,!0,a)
+k=A.cp(A.k0(d,m,m),m,m)
+i=A.cN("supabase.storage")
+e=A.cp($.aZm(),m,m)
+e.I(0,k)
+e=new A.atK(0,i,f,e)
+e.c=new A.acx(a0,A.cN("supabase.storage"))
+i.b_(B.dR,"Initialize SupabaseStorageClient v2.8.0 with url: "+f+", retryAttempts: 0",null,null)
+i.b_(B.bk,"Initialize with headers: "+k.k(0),null,null)
+c.ay!==$&&A.aF()
+c.ay=e
+e=A.U(["apikey",p],m,t.z)
+k=A.p(m,m)
+k.m(0,"apikey",p)
+k.I(0,A.k0(d,m,m))
+m=A.b6W(h,B.qP,null,null,k,a0,null,e,B.lX,null)
+c.ch!==$&&A.aF()
+c.ch=m
+j.b_(B.dR,"Initialize SupabaseClient v2.16.1 with no custom access token",null,null)
+c.anR()
+o.b=c
+o.at4()
+o.a=!0
+a5=o.c=new A.Vu($.aZg(),A.cN("supabase.supabase_flutter"))
 s=3
-return A.k(a3.oD(n),$async$Vy)
-case 3:o=a3.uM()
-m=$.ag
-m=new A.Op(new A.aN(new A.a7(m,t.LR),t.zh),new A.aN(new A.a7(m,t.xF),t.oe),null,t.Od)
-m.d4(o)
-a4=m.f
-a5.e=a4===$?m.f=new A.Oq(m,t.Ew):a4
-p.b_(B.eT,"***** Supabase init completed *****",null,null)
-q=a5
+return A.k(a5.oD(l),$async$Vy)
+case 3:m=a5.uM()
+k=$.ag
+k=new A.Op(new A.aN(new A.a7(k,t.LR),t.zh),new A.aN(new A.a7(k,t.xF),t.oe),null,t.Od)
+k.d4(m)
+a6=k.f
+o.e=a6===$?k.f=new A.Oq(k,t.Ew):a6
+n.b_(B.eT,"***** Supabase init completed *****",null,null)
+q=o
 s=1
 break
 case 1:return A.r(q,r)}})
@@ -48686,7 +48688,7 @@ k=o.pop()
 p=8
 m=A.aVx()
 s=11
-return A.k(A.Vy(A.aVw(),m),$async$Ba)
+return A.k(A.Vy(null,A.aVw(),m),$async$Ba)
 case 11:m=$.j0().b
 m===$&&A.a()
 q=m
