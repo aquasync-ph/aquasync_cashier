@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/models.dart';
 import '../models/gcash_models.dart';
+import '../supabase_config.dart';
 
 class AppState extends ChangeNotifier {
   String? _cashierName;
@@ -33,11 +34,27 @@ class AppState extends ChangeNotifier {
   StreamSubscription<List<Map<String, dynamic>>>? _ordersStreamSubscription;
   StreamSubscription<List<Map<String, dynamic>>>? _profileStreamSubscription;
 
-  SupabaseClient get _supabase {
+  Future<SupabaseClient> _getSupabaseClient() async {
     try {
       return Supabase.instance.client;
     } catch (_) {
-      throw Exception('Supabase connection is not initialized. Please refresh the page or check network settings.');
+      try {
+        await Supabase.initialize(
+          url: SupabaseConfig.url,
+          publishableKey: SupabaseConfig.anonKey,
+        );
+        return Supabase.instance.client;
+      } catch (e) {
+        throw Exception('Failed to initialize Supabase: $e');
+      }
+    }
+  }
+
+  SupabaseClient get _supabase {
+    try {
+      return Supabase.instance.client;
+    } catch (e) {
+      throw Exception('Supabase connection is not initialized ($e). Please refresh the page or check network settings.');
     }
   }
 
@@ -388,7 +405,9 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _supabase.auth.signInWithPassword(
+      final client = await _getSupabaseClient();
+
+      final response = await client.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -398,7 +417,7 @@ class AppState extends ChangeNotifier {
         throw Exception('Login failed: Invalid credentials');
       }
 
-      final profile = await _supabase
+      final profile = await client
           .from('profiles')
           .select('*')
           .eq('id', user.id)
@@ -406,7 +425,7 @@ class AppState extends ChangeNotifier {
 
       final role = profile['role']?.toString().toLowerCase();
       if (role != 'cashier') {
-        await _supabase.auth.signOut();
+        await client.auth.signOut();
         throw Exception('Access denied: role = cashier required. Your account role is "$role".');
       }
 
