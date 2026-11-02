@@ -31468,11 +31468,11 @@ b4Z(a,b,c,d,e,f){var s=a[b]()
 return s},
 aTB(a,b,c){var s=null
 return c.a(A.b4Z(a,b,s,s,s,s))},
-aVx(){var s,r=B.c.b4("[https://qxruxonusvoxshuwxrah.supabase.co](https://qxruxonusvoxshuwxrah.supabase.co)")
-if(r.length!==0)return r
+aVx(){var s,r="https://qxruxonusvoxshuwxrah.supabase.co",q=B.c.b4(r)
+if(q.length!==0)return q
 s=$.aMT().ga2f().h(0,"SUPABASE_URL")
 if(s!=null&&B.c.b4(s).length!==0)return B.c.b4(s)
-return"https://qxruxonusvoxshuwxrah.supabase.co"},
+return r},
 aVw(){var s,r="sb_publishable_MbMRR6syNwtezcWMke6yXw_Y1cozFRo",q=B.c.b4(r)
 if(q.length!==0)return q
 s=$.aMT().ga2f().h(0,"SUPABASE_ANON_KEY")
