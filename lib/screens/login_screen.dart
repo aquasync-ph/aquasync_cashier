@@ -26,7 +26,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late Animation<double> _shakeAnimation;
 
   late AnimationController _entranceController;
-  late Animation<double> _headerAnim;
   late Animation<double> _bodyFade;
   late Animation<Offset> _bodySlide;
 
@@ -45,10 +44,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    );
-
-    _headerAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutCubic),
     );
 
     _bodyFade = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -233,8 +228,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          (Route<dynamic> route) => false, // Clears the entire stack
         );
       }
     });

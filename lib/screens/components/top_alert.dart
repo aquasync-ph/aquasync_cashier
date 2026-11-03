@@ -41,7 +41,6 @@ class TopAlert {
         icon = Icons.warning_rounded;
         break;
       case AlertType.info:
-      default:
         bg = AppColors.lightAqua;
         borderClr = AppColors.primary;
         textClr = AppColors.navy;

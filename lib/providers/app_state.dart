@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/models.dart';
 import '../models/gcash_models.dart';
@@ -24,7 +25,7 @@ class AppState extends ChangeNotifier {
   List<Product> _availableProducts = [];
   List<PendingApprovalRecord> _pendingApprovals = [];
   List<DriverInfo> _deliveryDrivers = [];
-  List<ApprovalHistoryRecord> _approvalHistory = [];
+  final List<ApprovalHistoryRecord> _approvalHistory = [];
   bool _isAuthorizedByAdmin = true;
   bool _canAcceptOrders = true;
   bool _canAssignDrivers = true;
@@ -154,7 +155,7 @@ class AppState extends ChangeNotifier {
     try {
       final uniquePhone = cleanPhone == 'N/A' || cleanPhone.isEmpty
           ? 'WALKIN-${DateTime.now().millisecondsSinceEpoch}'
-          : '${cleanPhone}-${DateTime.now().millisecondsSinceEpoch}';
+          : '$cleanPhone-${DateTime.now().millisecondsSinceEpoch}';
 
       final profilePayload = <String, dynamic>{
         'full_name': cleanName,
@@ -355,43 +356,104 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  static const String _kCashierNameKey = 'cached_cashier_name';
+  static const String _kCashierIdKey = 'cached_cashier_id';
+  static const String _kCanAcceptOrdersKey = 'cached_can_accept_orders';
+  static const String _kCanAssignDriversKey = 'cached_can_assign_drivers';
+  
+  final _secureStorage = const FlutterSecureStorage();
+
+  Future<void> _saveSessionToLocal() async {
+    try {
+      if (_cashierName != null) await _secureStorage.write(key: _kCashierNameKey, value: _cashierName!);
+      if (_cashierId != null) await _secureStorage.write(key: _kCashierIdKey, value: _cashierId!);
+      await _secureStorage.write(key: _kCanAcceptOrdersKey, value: _canAcceptOrders.toString());
+      await _secureStorage.write(key: _kCanAssignDriversKey, value: _canAssignDrivers.toString());
+    } catch (e) {
+      debugPrint('Error saving session locally: $e');
+    }
+  }
+
+  Future<void> _clearSessionLocal() async {
+    try {
+      await _secureStorage.delete(key: _kCashierNameKey);
+      await _secureStorage.delete(key: _kCashierIdKey);
+      await _secureStorage.delete(key: _kCanAcceptOrdersKey);
+      await _secureStorage.delete(key: _kCanAssignDriversKey);
+    } catch (e) {
+      debugPrint('Error clearing session locally: $e');
+    }
+  }
+
   Future<bool> restoreSession() async {
     try {
       await loadTransactionsFromLocal();
       final session = _supabase.auth.currentSession;
       final user = session?.user;
       if (user != null) {
-        final profile = await _supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
+        bool profileLoaded = false;
+        try {
+          final profile = await _supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single();
 
-        final role = profile['role']?.toString().toLowerCase();
-        if (role == 'cashier') {
-          _cashierName = profile['full_name'] ?? 'Cashier';
-          _cashierId = user.id;
-          if (profile.containsKey('can_accept_orders') && profile['can_accept_orders'] != null) {
-            _canAcceptOrders = profile['can_accept_orders'] == true;
+          final role = profile['role']?.toString().toLowerCase();
+          if (role == 'cashier') {
+            _cashierName = profile['full_name'] ?? 'Cashier';
+            _cashierId = user.id;
+            if (profile.containsKey('can_accept_orders') && profile['can_accept_orders'] != null) {
+              _canAcceptOrders = profile['can_accept_orders'] == true;
+            }
+            if (profile.containsKey('can_assign_drivers') && profile['can_assign_drivers'] != null) {
+              _canAssignDrivers = profile['can_assign_drivers'] == true;
+            }
+            await _saveSessionToLocal();
+            profileLoaded = true;
+          } else {
+            debugPrint('Session restore rejected: Account role "$role" is not cashier.');
+            await _supabase.auth.signOut();
+            await _clearSessionLocal();
+            return false;
           }
-          if (profile.containsKey('can_assign_drivers') && profile['can_assign_drivers'] != null) {
-            _canAssignDrivers = profile['can_assign_drivers'] == true;
+        } catch (e) {
+          debugPrint('Could not fetch profile from Supabase (maybe offline): $e');
+          // Fallback to secure local session data
+          final cachedId = await _secureStorage.read(key: _kCashierIdKey);
+          if (cachedId == user.id) {
+            _cashierName = (await _secureStorage.read(key: _kCashierNameKey)) ?? 'Cashier';
+            _cashierId = cachedId;
+            _canAcceptOrders = (await _secureStorage.read(key: _kCanAcceptOrdersKey)) == 'true';
+            _canAssignDrivers = (await _secureStorage.read(key: _kCanAssignDriversKey)) == 'true';
+            profileLoaded = true;
+            debugPrint('Restored cashier profile from secure local cache.');
+          } else {
+             rethrow;
           }
-          await loadProducts();
-          await loadGCashSettings();
-          await fetchPendingApprovals();
-          subscribeToProductsRealtime();
-          subscribeToRfidRegistryRealtime();
-          subscribeToSalesRealtime();
-          subscribeToCashierProfileRealtime();
-          await checkAdminAuthorization();
-          await loadDailySales();
+        }
+
+        if (profileLoaded) {
+          try {
+            await loadProducts();
+            await loadGCashSettings();
+            await fetchPendingApprovals();
+            await checkAdminAuthorization();
+            await loadDailySales();
+          } catch (e) {
+            debugPrint('Note: some data could not be loaded on startup: $e');
+          }
+          
+          try {
+            subscribeToProductsRealtime();
+            subscribeToRfidRegistryRealtime();
+            subscribeToSalesRealtime();
+            subscribeToCashierProfileRealtime();
+          } catch (e) {
+            debugPrint('Note: realtime subscriptions failed on startup: $e');
+          }
           notifyListeners();
           return true;
-        } else {
-          debugPrint('Session restore rejected: Account role "$role" is not cashier.');
-          await _supabase.auth.signOut();
-          return false;
         }
       }
     } catch (e) {
@@ -438,16 +500,27 @@ class AppState extends ChangeNotifier {
         _canAssignDrivers = profile['can_assign_drivers'] == true;
       }
 
-      await loadTransactionsFromLocal();
-      await loadProducts();
-      await loadGCashSettings();
-      await fetchPendingApprovals();
-      subscribeToProductsRealtime();
-      subscribeToRfidRegistryRealtime();
-      subscribeToSalesRealtime();
-      subscribeToCashierProfileRealtime();
-      await checkAdminAuthorization();
-      await loadDailySales();
+      await _saveSessionToLocal();
+
+      try {
+        await loadTransactionsFromLocal();
+        await loadProducts();
+        await loadGCashSettings();
+        await fetchPendingApprovals();
+        await checkAdminAuthorization();
+        await loadDailySales();
+      } catch (e) {
+        debugPrint('Note: some data could not be loaded on login: $e');
+      }
+
+      try {
+        subscribeToProductsRealtime();
+        subscribeToRfidRegistryRealtime();
+        subscribeToSalesRealtime();
+        subscribeToCashierProfileRealtime();
+      } catch (e) {
+        debugPrint('Note: realtime subscriptions failed on login: $e');
+      }
 
     } catch (e) {
       _isLoading = false;
@@ -507,15 +580,7 @@ class AppState extends ChangeNotifier {
       return str;
     }
 
-    String? sanitizePhone(String? raw) {
-      if (raw == null) return null;
-      final str = raw.trim();
-      final digits = str.replaceAll(RegExp(r'[^\d+]'), '');
-      if (digits.length >= 10 && (digits.startsWith('09') || digits.startsWith('639') || digits.startsWith('+639'))) {
-        return str;
-      }
-      return null;
-    }
+
 
     final stationCandidateTables = [
       'station_settings',
@@ -811,9 +876,12 @@ class AppState extends ChangeNotifier {
     _rfidStreamSubscription = null;
     _salesStreamSubscription?.cancel();
     _salesStreamSubscription = null;
+    _profileStreamSubscription?.cancel();
+    _profileStreamSubscription = null;
 
     try {
       await _supabase.auth.signOut();
+      await _clearSessionLocal();
     } catch (e) {
       debugPrint('Logout note: $e');
     }
@@ -1668,7 +1736,7 @@ class AppState extends ChangeNotifier {
           customerId = idStr;
         } else {
           try {
-            final uniquePhone = (_selectedCustomer!.phone == null || _selectedCustomer!.phone == 'N/A' || _selectedCustomer!.phone!.isEmpty)
+            final uniquePhone = (_selectedCustomer!.phone == 'N/A' || _selectedCustomer!.phone.isEmpty)
                 ? 'WALKIN-${DateTime.now().millisecondsSinceEpoch}'
                 : '${_selectedCustomer!.phone}-${DateTime.now().millisecondsSinceEpoch}';
 

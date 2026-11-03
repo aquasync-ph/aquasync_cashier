@@ -568,7 +568,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 HapticFeedback.heavyImpact();
                                 Navigator.of(dialogContext).pop();
                                 context.read<AppState>().logout();
-                                Navigator.of(context).pushReplacementNamed('/');
+                                Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                               },
                               child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, letterSpacing: 0.5)),
                             ),
@@ -586,148 +586,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showPendingApprovalsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            final appState = context.watch<AppState>();
-            final pendingList = appState.pendingApprovals;
 
-            return AlertDialog(
-              backgroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.lightAqua,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.verified_user_rounded, color: AppColors.electricCyan, size: 22),
-                  ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text(
-                      'Pending Approvals (Admin Away)',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryDarkNavy),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh_rounded, size: 20),
-                    onPressed: () async {
-                      await appState.fetchPendingApprovals();
-                    },
-                    tooltip: 'Refresh Pending',
-                  ),
-                ],
-              ),
-              content: SizedBox(
-                width: 500,
-                height: 400,
-                child: pendingList.isEmpty
-                    ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check_circle_outline_rounded, size: 64, color: AppColors.success),
-                            SizedBox(height: 12),
-                            Text(
-                              'No pending approvals found!',
-                              style: TextStyle(color: AppColors.grayText, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: pendingList.length,
-                        itemBuilder: (context, index) {
-                          final item = pendingList[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            elevation: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.lightAqua,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(Icons.nfc_rounded, color: AppColors.electricCyan),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'RFID: ${item.code}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.primaryDarkNavy),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Customer: ${item.customerName}',
-                                          style: const TextStyle(fontSize: 12, color: AppColors.grayText),
-                                        ),
-                                        if (item.createdAt != null) ...[
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            'Requested: ${DateFormat('MMM d, yyyy h:mm a').format(item.createdAt!)}',
-                                            style: const TextStyle(fontSize: 10, color: AppColors.grayText),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                  ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primaryNavy,
-                                      foregroundColor: AppColors.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                    ),
-                                    icon: const Icon(Icons.check_rounded, size: 16),
-                                    label: const Text('Confirm', style: TextStyle(fontSize: 12)),
-                                    onPressed: () async {
-                                      try {
-                                        await appState.confirmPendingRecord(item.id, appState.cashierName ?? 'Cashier');
-                                        if (context.mounted) {
-                                          TopAlert.show(context, 'Successfully confirmed RFID: ${item.code}', type: AlertType.success, title: 'RFID Confirmed');
-                                        }
-                                      } catch (e) {
-                                        if (context.mounted) {
-                                          TopAlert.show(context, 'Error confirming: ${e.toString().replaceAll('Exception: ', '')}', type: AlertType.error, title: 'Confirmation Failed');
-                                        }
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Close', style: TextStyle(color: AppColors.grayText, fontWeight: FontWeight.w600)),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1650,7 +1509,7 @@ class _CartAndPaymentSection extends StatelessWidget {
                       ? Image.network(
                           item.product.imageUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(item.product.icon, size: 18, color: AppColors.primary),
+                          errorBuilder: (_, _, _) => Icon(item.product.icon, size: 18, color: AppColors.primary),
                         )
                       : Icon(item.product.icon, size: 18, color: AppColors.primary),
                 ),
@@ -2778,10 +2637,12 @@ class _PendingApprovalsTabViewState extends State<_PendingApprovalsTabView> {
   @override
   void initState() {
     super.initState();
+    final appState = context.read<AppState>();
     Future.microtask(() {
-      context.read<AppState>().checkAdminAuthorization();
-      context.read<AppState>().fetchPendingApprovals();
-      context.read<AppState>().fetchDeliveryDrivers();
+      if (!mounted) return;
+      appState.checkAdminAuthorization();
+      appState.fetchPendingApprovals();
+      appState.fetchDeliveryDrivers();
     });
   }
 
