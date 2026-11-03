@@ -153,6 +153,7 @@ class AppDesign {
         fontWeight: FontWeight.w900,
         fontSize: 18,
         color: AppColors.navy,
+        letterSpacing: -0.3,
       ),
     ),
     cardTheme: CardThemeData(
@@ -166,21 +167,21 @@ class AppDesign {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDesign.inputRadius),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDesign.inputRadius),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDesign.inputRadius),
         borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
-      labelStyle: const TextStyle(color: AppColors.slate, fontSize: 14, fontWeight: FontWeight.w500),
-      hintStyle: const TextStyle(color: AppColors.slate, fontSize: 14),
+      labelStyle: const TextStyle(color: AppColors.slate, fontSize: 13.5, fontWeight: FontWeight.w600),
+      hintStyle: const TextStyle(color: AppColors.lightGrayText, fontSize: 13.5),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -196,8 +197,8 @@ class AppDesign {
           fontWeight: FontWeight.w900,
           letterSpacing: 0.8,
         ),
-        elevation: 4,
-        shadowColor: AppColors.primary.withValues(alpha: 0.3),
+        elevation: 6,
+        shadowColor: AppColors.primary.withValues(alpha: 0.35),
       ),
     ),
   );
@@ -319,6 +320,100 @@ class LiquidButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class IosGlassContainer extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
+  final Color? backgroundColor;
+
+  const IosGlassContainer({
+    super.key,
+    required this.child,
+    this.padding,
+    this.onTap,
+    this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppDesign.cardRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap != null ? () {
+              HapticFeedback.lightImpact();
+              onTap!();
+            } : null,
+            child: Container(
+              padding: padding ?? const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: (backgroundColor ?? Colors.white).withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(AppDesign.cardRadius),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5),
+                boxShadow: AppDesign.premiumShadow,
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class IosGlowBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData? icon;
+
+  const IosGlowBadge({
+    super.key,
+    required this.label,
+    required this.color,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
