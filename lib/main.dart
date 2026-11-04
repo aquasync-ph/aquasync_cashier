@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/app_state.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'theme.dart';
 import 'supabase_config.dart';
 
@@ -21,6 +22,11 @@ Future<void> main() async {
     await Supabase.initialize(
       url: SupabaseConfig.url,
       publishableKey: SupabaseConfig.anonKey,
+      authOptions: FlutterAuthClientOptions(
+        localStorage: SharedPreferencesLocalStorage(
+          persistSessionKey: 'aquasync_cashier_session_key',
+        ),
+      ),
     );
   } catch (e) {
     debugPrint('Supabase initialization error: $e');
@@ -49,6 +55,7 @@ class AquaSyncApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
       },
     );
   }

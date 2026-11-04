@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       setState(() {
         _cashReceived = double.tryParse(_cashController.text) ?? 0.0;
       });
+    });
+
+    // Route protection: ensure user is authenticated, otherwise redirect to login
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
     });
   }
 
@@ -568,7 +577,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 HapticFeedback.heavyImpact();
                                 Navigator.of(dialogContext).pop();
                                 context.read<AppState>().logout();
-                                Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                               },
                               child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, letterSpacing: 0.5)),
                             ),

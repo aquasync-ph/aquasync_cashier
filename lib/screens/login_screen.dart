@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/app_state.dart';
 import '../theme.dart';
-import 'dashboard_screen.dart';
 import 'components/top_alert.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -55,6 +54,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     );
 
     _entranceController.forward();
+
+    // Ensure that if user already has an active session (e.g. visiting /login via browser history/back),
+    // they are automatically restored & redirected to dashboard instead of being logged out.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session != null) {
+          final isAuthenticated = await context.read<AppState>().restoreSession();
+          if (mounted && isAuthenticated) {
+            Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+          }
+        }
+      } catch (e) {
+        debugPrint('LoginScreen session check note: $e');
+      }
+    });
   }
 
   @override
@@ -228,8 +243,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/dashboard',
           (Route<dynamic> route) => false, // Clears the entire stack
         );
       }

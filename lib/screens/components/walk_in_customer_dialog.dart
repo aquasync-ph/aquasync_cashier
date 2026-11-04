@@ -22,7 +22,7 @@ class _WalkInCustomerDialogState extends State<WalkInCustomerDialog> {
   late TextEditingController _addressController;
   late MapController _mapController;
 
-  LatLng _pinnedLocation = const LatLng(14.5995, 120.9842); // Default Manila / PH
+  LatLng _pinnedLocation = const LatLng(14.2289, 121.3283); // Default Victoria, Laguna
   bool _isGeocoding = false;
   bool _isReverseGeocoding = false;
   bool _isUpdatingFromMapTap = false;
@@ -52,6 +52,8 @@ class _WalkInCustomerDialogState extends State<WalkInCustomerDialog> {
           _geocodeAddress(_addressController.text.trim(), moveMap: false);
         }
       });
+    } else {
+      _statusMessage = '📍 Default: Victoria, Laguna. Tap map or search address.';
     }
   }
 
